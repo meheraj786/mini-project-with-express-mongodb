@@ -3,8 +3,11 @@ const router = require("./routes");
 const { dbConnect } = require("./db/connectDb");
 const app = express();
 
+
 (async () => {
   try {
+    const cors=require("cors")
+    app.use(cors())
     app.use(express.json())
     require('dotenv').config()
     await dbConnect()
