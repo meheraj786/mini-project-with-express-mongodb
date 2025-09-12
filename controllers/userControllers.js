@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const bcrypt=require("bcrypt")
+const jwt=require("jsonwebtoken")
 
 exports.createUser = async (req, res) => {
   const { name, username, age, email, password } = req.body;
@@ -20,20 +21,29 @@ exports.createUser = async (req, res) => {
       });
 };
 exports.loginUser = async (req, res) => {
-  const { name, username, age, email, password } = req.body;
+  const { email, password } = req.body;
   let user = await User.findOne({email});
-  if (user) return res.status(500).json({message:"User Already Registered"})
-   bcrypt.hash(password, 10, async function(err, hash) {
-        const newUser =  new User({
-          name,
-          username,
-          age,
-          email,
-          password: hash,
-        });
-        const savedUser=await newUser.save()
-        res.status(201).json({
-          message: savedUser
-        })
-      });
+  if (!user) return res.status(500).json({message:"User is not created!"})
+
+  bcrypt.compare(password, user.password, function(err, result) {
+    if (result) {
+      const token = jwt.sign({ email: email }, 'shhhhh');
+      res.cookie("token", token)
+      res.status(200).json({
+        message: "You Can Login"
+      })
+    }else{
+      res.status(500).json({
+        message: "Password is not Match"
+      })
+    }
+});
 };
+exports.logout = async (req, res) => {
+
+      await res.cookie("token", "")
+      res.json({
+        message: "Logout Successfull"
+      })
+
+}
