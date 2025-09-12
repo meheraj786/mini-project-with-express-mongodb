@@ -45,8 +45,10 @@ exports.profile = async (req, res) => {
       data: "no user",
     });
   } else {
+    const profile= await User.findOne({email: req.user.email})
+    await profile.populate("posts")
     res.json({
-      data: req.user,
+      data: profile,
     });
   }
 };
