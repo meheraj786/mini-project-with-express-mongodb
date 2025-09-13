@@ -28,7 +28,12 @@ exports.loginUser = async (req, res) => {
   bcrypt.compare(password, user.password, function (err, result) {
     if (result) {
       const token = jwt.sign({ email: email }, "shhhhh");
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false, 
+        sameSite: "strict", 
+        maxAge: 60 * 60 * 1000, 
+      });
       res.status(200).json({
         message: "You Can Login",
       });
@@ -45,8 +50,8 @@ exports.profile = async (req, res) => {
       data: "no user",
     });
   } else {
-    const profile= await User.findOne({email: req.user.email})
-    await profile.populate("posts")
+    const profile = await User.findOne({ email: req.user.email });
+    await profile.populate("posts");
     res.json({
       data: profile,
     });

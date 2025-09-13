@@ -5,13 +5,18 @@ const app = express();
 
 (async () => {
   try {
-    const cookieParser=require("cookie-parser")
-    app.use(cookieParser())
-    const cors=require("cors")
-    app.use(cors())
-    app.use(express.json())
-    require('dotenv').config()
-    await dbConnect()
+    const cookieParser = require("cookie-parser");
+    app.use(cookieParser());
+    const cors = require("cors");
+    app.use(
+      cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+      })
+    );
+    app.use(express.json());
+    require("dotenv").config();
+    await dbConnect();
     app.use("/", router);
     const PORT = process.env.PORT;
     app.listen(PORT, () => {
